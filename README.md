@@ -15,13 +15,13 @@ Here is the list of public API's exposed by the IpChecker module as well as a br
 
 - <a href="#IpChecker">IpChecker()</a>
 - <a href="#checkIp">.checkIp()</a>
-- - <a href="#numberOfAttempts">.numberOfAttempts()</a>
+- <a href="#numberOfAttempts">.numberOfAttempts()</a>
 - <a href="#maxAttempts">.maxAttempts()</a>
 - <a href="#addIpAttempt">.addIpAttempt()</a>
 - <a href="#removeIpAttempts">.removeIpAttempts()</a>
 - <a href="#isTimeout">.isTimeout()</a>
-- - <a href="#addIpTimeout">.addIpTimeout()</a>
-- - <a href="#removeIpTimeout">.removeIpTimeout()</a>
+- <a href="#addIpTimeout">.addIpTimeout()</a>
+- <a href="#removeIpTimeout">.removeIpTimeout()</a>
 
 ###IpChecker(time, attempts, redirectPage) <a name="IpChecker"></a>
 *@param*  {Number}   **time**  [for how much time IpChecker must freeze an ip address ( default value: 10 mins )]  

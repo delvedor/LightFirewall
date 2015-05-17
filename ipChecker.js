@@ -34,14 +34,13 @@ IpChecker.prototype = {
  */
 IpChecker.prototype.checkIp = function(req, res, next) {
   var ip = req.connection.remoteAddress;
-  if (_.isTimeout[ip]) {
+  if (_.isTimeout(ip)) {
     _.redirectPage ? res.redirect(_.redirectPage) : res.end();
 
   } else if (_.ipsAttempts[ip] >= _.attempts) {
-    _.ipsTimeout[ip] = setTimeout(function() {
-      _.removeIpTimeout(ip);
-      _.removeIpAttempts(ip);
-    }, _.time);
+    var timeout = new Date();
+    timeout.setMilliseconds(timeout.getMilliseconds() + _.time);
+    _.ipsTimeout[ip] = timeout;
     _.redirectPage ? res.redirect(_.redirectPage) : res.end();
 
   } else {
@@ -72,7 +71,7 @@ IpChecker.prototype.numberOfAttempts = function(ip) {
  * otherwise, false.
  */
 IpChecker.prototype.maxAttempts = function(ip) {
-  if (_.ipsAttempts[ip] && _.ipsAttempts[ip] > _.attempts)
+  if (_.ipsAttempts[ip] && _.ipsAttempts[ip] >= _.attempts)
     return true;
   return false;
 };
@@ -113,8 +112,16 @@ IpChecker.prototype.removeIpAttempts = function(ip) {
  * otherwise, false.
  */
 IpChecker.prototype.isTimeout = function(ip) {
-  if (_.ipsTimeout[ip])
-    return true;
+  if (_.ipsTimeout[ip]) {
+    var date = new Date();
+    if (date < _.ipsTimeout[ip]) {
+      return true;
+    } else {
+      _.removeIpTimeout(ip);
+      _.removeIpAttempts(ip);
+      return false;
+    }
+  }
   return false;
 };
 
@@ -129,10 +136,9 @@ IpChecker.prototype.isTimeout = function(ip) {
  * Then redirects the ip to the custom redirectPage or closes the connection.
  */
 IpChecker.prototype.addIpTimeout = function(ip, time, res, redirectPage) {
-  _.ipsTimeout[ip] = setTimeout(function() {
-    _.removeIpTimeout(ip);
-    _.removeIpAttempts(ip);
-  }, time);
+  var timeout = new Date();
+  timeout.setMilliseconds(timeout.getMilliseconds() + time);
+  _.ipsTimeout[ip] = timeout;
   _.ipsAttempts[ip] = _.attempts;
   redirectPage ? res.redirect(redirectPage) : res.end();
 };
@@ -145,10 +151,8 @@ IpChecker.prototype.addIpTimeout = function(ip, time, res, redirectPage) {
  * if so, it removes the ip from the object and clears the timeout.
  */
 IpChecker.prototype.removeIpTimeout = function(ip) {
-  if (_.ipsTimeout[ip]) {
-    clearTimeout(_.ipsTimeout[ip]);
+  if (_.ipsTimeout[ip])
     delete _.ipsTimeout[ip];
-  }
 };
 
 module.exports = IpChecker;

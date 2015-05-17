@@ -28,7 +28,7 @@ var display = "";
  * @render {webpage}  [page]
  */
 router.get('/', function(req, res) {
-  if (ipc.maxAttempts(req.ip)) {
+  if (ipc.isTimeout(req.ip)) {
     message = 'You have made too many login attempts, wait 10 minutes before try again.';
     display = 'block';
   } else {

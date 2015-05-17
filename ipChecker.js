@@ -3,7 +3,7 @@
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
- * GitHub: https://github.com/delvedor/IpChecker
+ * GitHub: https://github.com/delvedor/ipChecker
  */
 
 var _; // self

@@ -1,19 +1,20 @@
 #IpChecker
 
-IpChecker is a tool built for NodeJs used to block the IP addresses that have made too many consecutive requests to the app based on a condition chosen by the developer.  
+IpChecker is a lightweight tool built for NodeJs, used to block the IP addresses that have made too many consecutive requests to the app based on a condition chosen by the developer.  
 Can be used as a "firewall" ahead the query-to-db function or in any part of your code where you need to moderate the amount of request from a single ip.
 
 ## Usage
 Simply download the file from this repository and put in the same directory (or in the /lib folder) of your project.  
 Then require the module in your code.
 ```Javascript
-var IpChecker = require("./ipChecker");
+var ipChecker = require("./ipChecker");
 ```
 
 ##API Reference
 Here is the list of public API's exposed by the IpChecker module as well as a brief description of their use and how they work.
 
-- <a href="#IpChecker">IpChecker()</a>
+- <a href="#ipChecker">ipChecker()</a>
+- <a href="#setParams">.setParams()</a>
 - <a href="#checkIp">.checkIp()</a>
 - <a href="#numberOfAttempts">.numberOfAttempts()</a>
 - <a href="#maxAttempts">.maxAttempts()</a>
@@ -23,17 +24,25 @@ Here is the list of public API's exposed by the IpChecker module as well as a br
 - <a href="#addIpTimeout">.addIpTimeout()</a>
 - <a href="#removeIpTimeout">.removeIpTimeout()</a>
 
-###IpChecker(time, attempts, redirectPage) <a name="IpChecker"></a>
-*@param*  {Number}   **time**  [for how much time IpChecker must freeze an ip address ( default value: 10 mins )]  
+###ipChecker(time, attempts, redirectPage) <a name="ipChecker"></a>
+*@param*  {Number}   **time**  [for how much time ipChecker must freeze an ip address ( default value: 10 mins )]  
 *@param*  {Number}   **attempts**  [how many failed attempts before freeze the ip address (default value: 4)]   
 *@param*  {String} **redirectPage** [where redirect the frozen ip address ( default value: res.end() )]
 
 ```Javascript
 // declaration without parameters
-var ipc = new IpChecker();
+var ipc = ipChecker();
 // declaration with parameters
-var ipc = new IpChecker((1000 * 10), 2, 'home');
+var ipc = ipChecker((1000 * 10), 2, 'home');
 ```
+
+###.setParams(time, attempts, redirectPage) <a name="setParams"></a>
+*@param* {Number} **time**         [time before timeout, default value 10 mins]  
+*@param* {Number} **attempts**     [max amount of attempts, default value is 4]  
+*@param* {String} **redirectPage** [page redirect used in checkIp, default value false]
+
+This function sets the custom values of time, attempts and redirectPage,  
+if this values are not given, it uses the defaults values. 
 
 ###.checkIp(req, res, next) <a name="checkIp"></a>
 *@param*  {Object}   **req**  [request params]  
@@ -41,7 +50,11 @@ var ipc = new IpChecker((1000 * 10), 2, 'home');
 *@param*  {Function} **next** [next function]
 
 This function checks if exist a timeout for a given ip, if not, check if the given ip  have reached the max amount of attempts, if so, it creates a timeout of 10 minutes, during the given ip cannot make query to the db.  
-If the given ip have not reached the max amount of attempts, the function leaves continue the request. 
+If the given ip have not reached the max amount of attempts, the function leaves continue the request.  
+If you are calling this function as a Express middleware, you must write it in this way:  
+```Javascript
+ipc.checkIp.bind(ipc)
+```
 
 ###.numberOfAttempts(ip) <a name="numberOfAttempts"></a>
 *@param*  {String} **ip**        [ip address of the request]  
@@ -93,6 +106,8 @@ if so, it removes the ip from the object and clears the timeout.
 
 ##Contributing
 If you feel you can help in any way, be it with examples, extra testing, or new features please open a pull request or open an issue.
+
+I would make a special thanks to [@framp](https://github.com/framp) for helping me to improving the code.
 
 ______________________________________________________________________________________________________________________
 ##License

@@ -1,22 +1,25 @@
 /*
- * Project: IpChecker
+ * Project: ipChecker
+ * Version: 1.0.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
  * GitHub: https://github.com/delvedor/ipChecker
  *
  * 
- * This is a basic example of the use of IpChecker.
+ * This is a basic example of the use of ipChecker in ExpressJs.
  * The GET code opens a login page and checks if the user has reached to max amount of attempts.
  * The POST checks if the result of the query is correct, 
- * is so, it logs the user and delete  the user's ip from the IpChecker's objects, 
- * if the result of the query is false, it adds the user's ip to the IpChecker's objects.
+ * is so, it logs the user and delete  the user's ip from the ipChecker's objects, 
+ * if the result of the query is false, it adds the user's ip to the ipChecker's objects.
  */
 
 var express = require('express');
-var IpChecker = require("./ipChecker");
-var ipc = new IpChecker((1000 * 60 * 10), 4, 'webpage');
 var router = express.Router();
+
+var ipChecker = require("./ipChecker");
+var ipc = ipChecker((1000 * 60 * 10), 4, 'webpage');
+
 var checkSQL = false;
 var message = "";
 var display = "";
@@ -49,7 +52,7 @@ router.get('/', function(req, res) {
  *
  * Before render the page, this function calls the functions ipc.checkIp and queryToDb.
  */
-router.post('/', ipc.checkIp, queryToDb, function(req, res) {
+router.post('/', ipc.checkIp.bind(ipc), queryToDb, function(req, res) {
   if (checkSQL) {
     ipc.removeIpAttempts(req.ip);
     message = 'Welcome!';

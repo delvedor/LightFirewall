@@ -1,7 +1,8 @@
 #IpChecker
 
 IpChecker is a lightweight tool built for NodeJs, used to block the IP addresses that have made too many consecutive requests to the app based on a condition chosen by the developer.  
-Can be used as a "firewall" ahead the query-to-db function or in any part of your code where you need to moderate the amount of request from a single ip.
+Can be used as a "firewall" ahead the query-to-db function or in any part of your code where you need to moderate the amount of request from a single ip.  
+*The code is available both in es5 and es6 version.*
 
 ## Usage
 Simply download the file from this repository and put in the same directory (or in the /lib folder) of your project.  
@@ -26,7 +27,7 @@ Here is the list of public API's exposed by the IpChecker module as well as a br
 
 ###ipChecker(time, attempts, redirectPage) <a name="ipChecker"></a>
 *@param*  {Number}   **time**  [for how much time ipChecker must freeze an ip address ( default value: 10 mins )]  
-*@param*  {Number}   **attempts**  [how many failed attempts before freeze the ip address (default value: 4)]   
+*@param*  {Number}   **attempts**  [how many failed attempts before freeze the ip address (default value: 4)]  
 *@param*  {String} **redirectPage** [where redirect the frozen ip address ( default value: res.end() )]
 
 ```Javascript
@@ -36,13 +37,15 @@ var ipc = ipChecker();
 var ipc = ipChecker((1000 * 10), 2, 'home');
 ```
 
-###.setParams(time, attempts, redirectPage) <a name="setParams"></a>
+###.setParams(time, attempts, redirectPage, reset) <a name="setParams"></a>
 *@param* {Number} **time**         [time before timeout, default value 10 mins]  
 *@param* {Number} **attempts**     [max amount of attempts, default value is 4]  
-*@param* {String} **redirectPage** [page redirect used in checkIp, default value false]
+*@param* {String} **redirectPage** [page redirect used in checkIp, default value false]  
+*@param* {Boolean} **reset** [if true, it resets the ipsTimeout and ipsAttempts objects, default value false]
 
 This function sets the custom values of time, attempts and redirectPage,  
-if this values are not given, it uses the defaults values. 
+if reset it's true, it resets the ipsTimeout and ipsAttempts objects,  
+if this values are not given, it uses the defaults values.
 
 ###.checkIp(req, res, next) <a name="checkIp"></a>
 *@param*  {Object}   **req**  [request params]  
@@ -93,7 +96,7 @@ otherwise, false.
 *@param* {String} **ip**            [ip address of the request]  
 *@param* {Number} **time**          [time before timeout]  
 *@param* {Object} **res**           [response params]  
-*@param* {String} **redirectPage**  [page redirect] 
+*@param* {String} **redirectPage**  [page redirect]
 
 This function add a custom timeout to the given ip in the ipsTimeout object.  
 Then redirects the ip to the custom redirectPage or closes the connection.

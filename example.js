@@ -1,16 +1,16 @@
 /*
  * Project: ipChecker
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
  * GitHub: https://github.com/delvedor/ipChecker
  *
- * 
+ *
  * This is a basic example of the use of ipChecker in ExpressJs.
  * The GET code opens a login page and checks if the user has reached to max amount of attempts.
- * The POST checks if the result of the query is correct, 
- * is so, it logs the user and delete  the user's ip from the ipChecker's objects, 
+ * The POST checks if the result of the query is correct,
+ * is so, it logs the user and delete  the user's ip from the ipChecker's objects,
  * if the result of the query is false, it adds the user's ip to the ipChecker's objects.
  */
 

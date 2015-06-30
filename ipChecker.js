@@ -1,6 +1,6 @@
 /*
  * Project: ipChecker
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
@@ -20,16 +20,20 @@ var ipChecker = {
    * @param {Number} time         [time before timeout, default value 10 mins]
    * @param {Number} attempts     [max amount of attempts, default value is 4]
    * @param {String} redirectPage [page redirect used in checkIp, default value false]
+   * @param {Boolean} reset [if true, it resets the ipsTimeout and ipsAttempts objects, default value false]
    *
-   * This function sets the custom values of time, attempts and redirectPage, 
+   * This function sets the custom values of time, attempts and redirectPage,
+   * if reset it's true, it resets the ipsTimeout and ipsAttempts objects,
    * if this values are not given, it uses the defaults values.
    */
-  setParams: function(time, attempts, redirectPage) {
+  setParams: function(time, attempts, redirectPage, reset) {
     this.time = time || 1000 * 60 * 10;
     this.attempts = attempts || 4;
     this.redirectPage = redirectPage || false;
-    this.ipsTimeout = {};
-    this.ipsAttempts = {};
+    if (reset) {
+      this.ipsTimeout = {};
+      this.ipsAttempts = {};
+    }
   },
 
   /**
@@ -38,10 +42,10 @@ var ipChecker = {
    * @param  {Object}   res  [response params]
    * @param  {Function} next [next function]
    *
-   * This function checks if exist a timeout for a given ip, 
-   * if not, check if the given ip  have reached the max amount of attempts, 
+   * This function checks if exist a timeout for a given ip,
+   * if not, check if the given ip  have reached the max amount of attempts,
    * if so, it creates a timeout of 10 minutes, during the given ip cannot make query to the db.
-   * If the given ip have not reached the max amount of attempts, the function leaves continue the request.  
+   * If the given ip have not reached the max amount of attempts, the function leaves continue the request.
    */
   checkIp: function(req, res, next) {
     var ip = req.connection.remoteAddress;
@@ -63,8 +67,8 @@ var ipChecker = {
    * numberOfAttempts
    * @param  {String}   ip      [ip address of the request]
    * @return {Number} attempts  [number of attempts of the ip]
-   * 
-   * This function return the number of attempts of a given ip, 
+   *
+   * This function return the number of attempts of a given ip,
    * if there are not attempts, it returns 0.
    */
   numberOfAttempts: function(ip) {
@@ -77,7 +81,7 @@ var ipChecker = {
    * maxAttempts
    * @param  {String}   ip   [ip address of the request]
    * @return {Boolean}
-   * 
+   *
    * This function return true if the given ip has reached the max amount of failed attempts,
    * otherwise, false.
    */
@@ -91,7 +95,7 @@ var ipChecker = {
   /**
    * addIpAttempt
    * @param {String} ip [ip address of the request]
-   * 
+   *
    * This function add an attempt to the given ip in the ipsAttempts object.
    * If the given ip is not present in the ipsAttempts object, it creates a new field.
    */
@@ -106,7 +110,7 @@ var ipChecker = {
    * removeIpAttempts
    * @param  {String}   ip   [ip address of the request]
    *
-   * This function checks if the given ip is present in the ipsAttempts object, 
+   * This function checks if the given ip is present in the ipsAttempts object,
    * if so, it removes the ip from the object.
    */
   removeIpAttempts: function(ip) {
@@ -118,8 +122,8 @@ var ipChecker = {
    * isTimeout
    * @param  {String}   ip   [ip address of the request]
    * @return {Boolean}
-   * 
-   * This function return true if the given ip has a timeout, 
+   *
+   * This function return true if the given ip has a timeout,
    * otherwise, false.
    */
   isTimeout: function(ip) {
@@ -142,8 +146,8 @@ var ipChecker = {
    * @param {Number} time          [time before timeout]
    * @param {Object} res           [response params]
    * @param {String} redirectPage  [page redirect]
-   * 
-   * This function add a custom timeout to the given ip in the ipsTimeout object. 
+   *
+   * This function add a custom timeout to the given ip in the ipsTimeout object.
    * Then redirects the ip to the custom redirectPage or closes the connection.
    */
   addIpTimeout: function(ip, time, res, redirectPage) {
@@ -158,7 +162,7 @@ var ipChecker = {
    * removeIpTimeout
    * @param  {String}   ip   [ip address of the request]
    *
-   * This function checks if the given ip is present in the ipsTimeout object, 
+   * This function checks if the given ip is present in the ipsTimeout object,
    * if so, it removes the ip from the object and clears the timeout.
    */
   removeIpTimeout: function(ip) {
@@ -177,7 +181,7 @@ var ipChecker = {
  */
 var generator = function(time, attempts, redirectPage) {
   var obj = Object.create(ipChecker);
-  obj.setParams(time, attempts, redirectPage);
+  obj.setParams(time, attempts, redirectPage, true);
   return obj;
 };
 

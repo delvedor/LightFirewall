@@ -1,6 +1,6 @@
 {
   "name": "ipchecker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "IpChecker is a lightweight tool built for NodeJs, used to block the IP addresses that have made too many consecutive requests to the app based on a condition chosen by the developer. ",
   "main": "ipChecker.js",
   "scripts": {

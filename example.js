@@ -1,6 +1,6 @@
 /*
  * Project: ipChecker
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
@@ -17,10 +17,9 @@
 var express = require('express');
 var router = express.Router();
 
-var ipChecker = require("./ipChecker");
-var ipc = ipChecker((1000 * 60 * 10), 4, 'webpage');
+var IpChecker = require("./ipChecker");
+var ipc = new IpChecker((1000 * 60 * 10), 4);
 
-var checkSQL = false;
 var message = "";
 var display = "";
 
@@ -31,16 +30,22 @@ var display = "";
  * @render {webpage}  [page]
  */
 router.get('/', function(req, res) {
-  if (ipc.isTimeout(req.ip)) {
-    message = 'You have made too many login attempts, wait 10 minutes before try again.';
-    display = 'block';
-  } else {
-    message = '';
-    display = 'none';
-  }
-  res.render('webpage', {
-    display: display,
-    message: message
+  ipc.maxAttempts(req.ip, function(bool) {
+    console.log('maxAttempts ' + bool);
+  });
+
+  ipc.numberOfAttempts(req.ip, function(attempts) {
+    console.log('numberOfAttempts ' + attempts);
+  });
+
+  ipc.isTimeout(req.ip, function(isTimeout) {
+    console.log('isTimeout ' + isTimeout);
+    message = 'get';
+    if (isTimeout)
+      message = 'timeout';
+    res.render('index', {
+      message: message
+    });
   });
 });
 
@@ -49,21 +54,22 @@ router.get('/', function(req, res) {
  * @param  {Object}   req  [request params]
  * @param  {Object}   res  [response params]
  * @render {webpage}  [page]
- *
- * Before render the page, this function calls the functions ipc.checkIp and queryToDb.
  */
-router.post('/', ipc.checkIp.bind(ipc), queryToDb, function(req, res) {
-  if (checkSQL) {
-    ipc.removeIpAttempts(req.ip);
-    message = 'Welcome!';
-    display = 'block';
-  } else {
-    ipc.addIpAttempt(req.ip);
-    message = 'User not found!';
-    display = 'block';
-  }
-  res.render('webpage', {
-    display: display,
-    message: message
+router.post('/', function(req, res, next) {
+  ipc.checkIp(req.ip, function(isTimeout) {
+    if (isTimeout) {
+      res.end();
+      return;
+    }
+    if (req.body.text === 'correct') {
+      ipc.removeIpAttempts(req.ip);
+      message = 'ok!';
+    } else {
+      ipc.addIpAttempt(req.ip);
+      message = 'error';
+    }
+    res.render('index', {
+      message: message
+    });
   });
 });

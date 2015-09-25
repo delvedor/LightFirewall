@@ -1,14 +1,15 @@
 {
   "name": "ipchecker",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "IpChecker is a lightweight tool built for NodeJs, used to block the IP addresses that have made too many consecutive requests to the app based on a condition chosen by the developer. ",
   "main": "ipChecker.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel ipChecker.es6.js --watch --out-file ipChecker.js",
+    "test": "node test || true"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/delvedor/ipChecker"
+    "url": "https://github.com/delvedor/ipChecker.git"
   },
   "keywords": [
     "ip",
@@ -17,10 +18,16 @@
     "nodejs",
     "javascript"
   ],
-  "author": "Tomas Della Vedova - @delvedor",
+  "author": "Tomas Della Vedova - @delvedor (http://delved.org)",
   "license": "GPLv2",
   "bugs": {
     "url": "https://github.com/delvedor/ipChecker/issues"
   },
-  "homepage": "https://github.com/delvedor/ipChecker"
+  "homepage": "https://github.com/delvedor/ipChecker",
+  "dependencies": {
+    "level": "^1.3.0"
+  },
+  "devDependencies": {
+    "tape": "^4.2.0"
+  }
 }

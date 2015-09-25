@@ -1,0 +1,17 @@
+{
+  "version": {
+    "major": 1,
+    "minor": 1,
+    "patch": 0
+  },
+  "status": null,
+  "build": {
+    "date": "2015.9.24",
+    "number": 8,
+    "total": 8
+  },
+  "commit": null,
+  "json": [
+    "package.json"
+  ]
+}

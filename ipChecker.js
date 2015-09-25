@@ -1,188 +1,241 @@
 /*
- * Project: ipChecker
- * Version: 1.0.1
+ * Project: IpChecker
+ * Version: 1.1.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
  * GitHub: https://github.com/delvedor/ipChecker
  */
 
-var ipChecker = {
+'use strict';
 
-  time: 1000 * 60 * 10, // time before timeout, default value 10 mins
-  attempts: 4, // max amount of attempts, default value is 4
-  redirectPage: false, // page redirect used in checkIp, default value false
-  ipsTimeout: {},
-  ipsAttempts: {},
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _level = require('level');
+
+var _level2 = _interopRequireDefault(_level);
+
+var IpChecker = (function () {
+  function IpChecker() {
+    var time = arguments.length <= 0 || arguments[0] === undefined ? 1000 * 60 * 10 : arguments[0];
+    var attempts = arguments.length <= 1 || arguments[1] === undefined ? 4 : arguments[1];
+
+    _classCallCheck(this, IpChecker);
+
+    this.time = time; // time before timeout, default value 10 mins
+    this.attempts = attempts; // max amount of attempts, default value is 4
+    this.ipsTimeout = (0, _level2['default'])('.ipchecker-ipstimeout');
+    this.ipsAttempts = (0, _level2['default'])('.ipchecker-ipsattempts');
+  }
 
   /**
    * setDefaultParams
-   * @param {Number} time         [time before timeout, default value 10 mins]
-   * @param {Number} attempts     [max amount of attempts, default value is 4]
-   * @param {String} redirectPage [page redirect used in checkIp, default value false]
-   * @param {Boolean} reset [if true, it resets the ipsTimeout and ipsAttempts objects, default value false]
+   * @param {Number}  time         [time before timeout in milliseconds, default value 10 mins]
+   * @param {Number}  attempts     [max amount of attempts, default value is 4]
    *
-   * This function sets the custom values of time, attempts and redirectPage,
-   * if reset it's true, it resets the ipsTimeout and ipsAttempts objects,
+   * This function sets the custom values of time and attempts,
    * if this values are not given, it uses the defaults values.
    */
-  setParams: function(time, attempts, redirectPage, reset) {
-    this.time = time || 1000 * 60 * 10;
-    this.attempts = attempts || 4;
-    this.redirectPage = redirectPage || false;
-    if (reset) {
-      this.ipsTimeout = {};
-      this.ipsAttempts = {};
+
+  _createClass(IpChecker, [{
+    key: 'setParams',
+    value: function setParams() {
+      var time = arguments.length <= 0 || arguments[0] === undefined ? 1000 * 60 * 10 : arguments[0];
+      var attempts = arguments.length <= 1 || arguments[1] === undefined ? 4 : arguments[1];
+
+      this.time = time;
+      this.attempts = attempts;
     }
-  },
 
-  /**
-   * checkIp
-   * @param  {Object}   req  [request params]
-   * @param  {Object}   res  [response params]
-   * @param  {Function} next [next function]
-   *
-   * This function checks if exist a timeout for a given ip,
-   * if not, check if the given ip  have reached the max amount of attempts,
-   * if so, it creates a timeout of 10 minutes, during the given ip cannot make query to the db.
-   * If the given ip have not reached the max amount of attempts, the function leaves continue the request.
-   */
-  checkIp: function(req, res, next) {
-    var ip = req.connection.remoteAddress;
-    if (this.isTimeout(ip)) {
-      this.redirectPage ? res.redirect(this.redirectPage) : res.end();
+    /**
+     * checkIp
+     * @param  {String}     ip        [ip address of the request]
+     * @param  {Function}   callback  [callback]
+     *
+     * This function checks if exist a timeout for the ip,
+     * if not, check if the given ip  have reached the max amount of attempts, if so, it creates a timeout and the callback returns true.
+     * If the given ip have not reached the max amount of attempts, the callback returns false.
+     */
+  }, {
+    key: 'checkIp',
+    value: function checkIp(ip, callback) {
+      var _this = this;
 
-    } else if (this.ipsAttempts[ip] >= this.attempts) {
+      this.ipsTimeout.get(ip, function (err, value) {
+        if (value) callback(true);else _this.ipsAttempts.get(ip, function (err2, attempt) {
+          attempt = attempt || 0;
+          if (attempt >= _this.attempts) {
+            var timeout = new Date();
+            timeout.setMilliseconds(timeout.getMilliseconds() + _this.time);
+            _this.ipsTimeout.put(ip, timeout, function (err3) {
+              if (err3) console.log('ipChecker/checkIp error -> ' + err3);
+            });
+            callback(true);
+          } else {
+            callback(false);
+          }
+        });
+      });
+    }
+
+    /**
+     * numberOfAttempts
+     * @param  {String}   ip        [ip address of the request]
+     * @param {Function} callback   [callback]
+     *
+     * The callback returns the number of attempts of a given ip,
+     * if there are not attempts, it returns null.
+     */
+  }, {
+    key: 'numberOfAttempts',
+    value: function numberOfAttempts(ip, callback) {
+      this.ipsAttempts.get(ip, function (err, attempt) {
+        attempt = Number(attempt) || null;
+        callback(attempt);
+      });
+    }
+
+    /**
+     * maxAttempts
+     * @param  {String}   ip        [ip address of the request]
+     * @param {Function} callback   [callback]
+     *
+     * The callback returns true if the given ip has reached the max amount of failed attempts,
+     * otherwise, false.
+     */
+  }, {
+    key: 'maxAttempts',
+    value: function maxAttempts(ip, callback) {
+      var _this2 = this;
+
+      this.ipsAttempts.get(ip, function (err, attempt) {
+        attempt = Number(attempt) || 0;
+        callback(attempt >= _this2.attempts);
+      });
+    }
+
+    /**
+     * addIpAttempt
+     * @param {String} ip [ip address of the request]
+     *
+     * This function adds an attempt to the given ip in the ipsAttempts db.
+     * If the given ip is not present in the ipsAttempts db, it creates a new field.
+     */
+  }, {
+    key: 'addIpAttempt',
+    value: function addIpAttempt(ip) {
+      var _this3 = this;
+
+      this.ipsAttempts.get(ip, function (err, attempt) {
+        if (!attempt) attempt = 1;else attempt++;
+        _this3.ipsAttempts.put(ip, attempt, function (err2) {
+          if (err2) console.log('ipChecker/addIpAttempt error -> ' + err2);
+        });
+      });
+    }
+
+    /**
+     * removeIpAttempts
+     * @param  {String}   ip   [ip address of the request]
+     *
+     * This function checks if the given ip is present in the ipsAttempts db,
+     * if so, it removes the ip from the db.
+     */
+  }, {
+    key: 'removeIpAttempts',
+    value: function removeIpAttempts(ip) {
+      var _this4 = this;
+
+      this.ipsAttempts.get(ip, function (err, attempt) {
+        if (attempt) _this4.ipsAttempts.del(ip, function (err2) {
+          if (err2) console.log('ipChecker/removeIpAttempts error -> ' + err2);
+        });
+      });
+    }
+
+    /**
+     * isTimeout
+     * @param  {String}   ip        [ip address of the request]
+     * @param {Function} callback   [callback]
+     *
+     * The callback returns true if the given ip has a timeout,
+     * otherwise, false.
+     */
+  }, {
+    key: 'isTimeout',
+    value: function isTimeout(ip, callback) {
+      var _this5 = this;
+
+      this.ipsTimeout.get(ip, function (err, value) {
+        if (!value) {
+          callback(false);
+        } else if (new Date() < Date.parse(value)) {
+          callback(true);
+        } else {
+          _this5.ipsTimeout.del(ip, function (err2) {
+            if (err2) console.log('ipChecker/isTimeout error -> ' + err2);
+          });
+          _this5.ipsAttempts.del(ip, function (err2) {
+            if (err2) console.log('ipChecker/isTimeout error -> ' + err2);
+          });
+          callback(false);
+        }
+      });
+    }
+
+    /**
+     * addIpTimeout
+     * @param {String} ip            [ip address of the request]
+     * @param {Number} time          [time before timeout]
+     * @param {Function} callback    [callback]
+     *
+     * This function adds a custom timeout to the given ip in the ipsTimeout db.
+     * Then calls the callback.
+     */
+  }, {
+    key: 'addIpTimeout',
+    value: function addIpTimeout(ip, time, callback) {
       var timeout = new Date();
-      timeout.setMilliseconds(timeout.getMilliseconds() + this.time);
-      this.ipsTimeout[ip] = timeout;
-      this.redirectPage ? res.redirect(this.redirectPage) : res.end();
-
-    } else {
-      next();
+      timeout.setMilliseconds(timeout.getMilliseconds() + time);
+      this.ipsTimeout.put(ip, timeout, function (err) {
+        if (err) console.log('ipChecker/addIpTimeout error -> ' + err);
+      });
+      this.ipsAttempts.put(ip, this.attempts, function (err) {
+        if (err) console.log('ipChecker/addIpTimeout error -> ' + err);
+      });
+      callback();
     }
-  },
 
-  /**
-   * numberOfAttempts
-   * @param  {String}   ip      [ip address of the request]
-   * @return {Number} attempts  [number of attempts of the ip]
-   *
-   * This function return the number of attempts of a given ip,
-   * if there are not attempts, it returns 0.
-   */
-  numberOfAttempts: function(ip) {
-    if (this.ipsAttempts[ip])
-      return this.ipsAttempts[ip];
-    return 0;
-  },
+    /**
+     * removeIpTimeout
+     * @param  {String}   ip   [ip address of the request]
+     *
+     * This function checks if the given ip is present in the ipsTimeout db,
+     * if so, it removes the ip from the db and clears the timeout.
+     */
+  }, {
+    key: 'removeIpTimeout',
+    value: function removeIpTimeout(ip) {
+      var _this6 = this;
 
-  /**
-   * maxAttempts
-   * @param  {String}   ip   [ip address of the request]
-   * @return {Boolean}
-   *
-   * This function return true if the given ip has reached the max amount of failed attempts,
-   * otherwise, false.
-   */
-  maxAttempts: function(ip) {
-    if (this.ipsAttempts[ip] && this.ipsAttempts[ip] >= this.attempts)
-      return true;
-    return false;
-  },
-
-
-  /**
-   * addIpAttempt
-   * @param {String} ip [ip address of the request]
-   *
-   * This function add an attempt to the given ip in the ipsAttempts object.
-   * If the given ip is not present in the ipsAttempts object, it creates a new field.
-   */
-  addIpAttempt: function(ip) {
-    if (this.ipsAttempts[ip])
-      this.ipsAttempts[ip] = this.ipsAttempts[ip] + 1;
-    else
-      this.ipsAttempts[ip] = 1;
-  },
-
-  /**
-   * removeIpAttempts
-   * @param  {String}   ip   [ip address of the request]
-   *
-   * This function checks if the given ip is present in the ipsAttempts object,
-   * if so, it removes the ip from the object.
-   */
-  removeIpAttempts: function(ip) {
-    if (this.ipsAttempts[ip])
-      delete this.ipsAttempts[ip];
-  },
-
-  /**
-   * isTimeout
-   * @param  {String}   ip   [ip address of the request]
-   * @return {Boolean}
-   *
-   * This function return true if the given ip has a timeout,
-   * otherwise, false.
-   */
-  isTimeout: function(ip) {
-    if (this.ipsTimeout[ip]) {
-      var date = new Date();
-      if (date < this.ipsTimeout[ip]) {
-        return true;
-      } else {
-        this.removeIpTimeout(ip);
-        this.removeIpAttempts(ip);
-        return false;
-      }
+      this.ipsTimeout.get(ip, function (err, value) {
+        if (value) _this6.ipsTimeout.del(ip, function (err2) {
+          if (err2) console.log('ipChecker/removeIpTimeout error -> ' + err2);
+        });
+      });
     }
-    return false;
-  },
+  }]);
 
-  /**
-   * addIpTimeout
-   * @param {String} ip            [ip address of the request]
-   * @param {Number} time          [time before timeout]
-   * @param {Object} res           [response params]
-   * @param {String} redirectPage  [page redirect]
-   *
-   * This function add a custom timeout to the given ip in the ipsTimeout object.
-   * Then redirects the ip to the custom redirectPage or closes the connection.
-   */
-  addIpTimeout: function(ip, time, res, redirectPage) {
-    var timeout = new Date();
-    timeout.setMilliseconds(timeout.getMilliseconds() + time);
-    this.ipsTimeout[ip] = timeout;
-    this.ipsAttempts[ip] = this.attempts;
-    redirectPage ? res.redirect(redirectPage) : res.end();
-  },
+  return IpChecker;
+})();
 
-  /**
-   * removeIpTimeout
-   * @param  {String}   ip   [ip address of the request]
-   *
-   * This function checks if the given ip is present in the ipsTimeout object,
-   * if so, it removes the ip from the object and clears the timeout.
-   */
-  removeIpTimeout: function(ip) {
-    if (this.ipsTimeout[ip])
-      delete this.ipsTimeout[ip];
-  }
-
-};
-
-/**
- * generator
- * @param  {Number} time         [time before timeout]
- * @param  {Number} attempts     [max amount of attempts]
- * @param  {String} redirectPage [page redirect used in checkIp]
- * @return {Object}              [Object.create of ipChecker with given params]
- */
-var generator = function(time, attempts, redirectPage) {
-  var obj = Object.create(ipChecker);
-  obj.setParams(time, attempts, redirectPage, true);
-  return obj;
-};
-
-module.exports = generator;
+exports['default'] = IpChecker;
+module.exports = exports['default'];

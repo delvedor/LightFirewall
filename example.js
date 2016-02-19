@@ -1,75 +1,47 @@
 /*
- * Project: ipChecker
- * Version: 1.1.0
+ * Project: IpChecker
+ * Version: 1.2.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
  * GitHub: https://github.com/delvedor/ipChecker
- *
- *
- * This is a basic example of the use of ipChecker in ExpressJs.
- * The GET code opens a login page and checks if the user has reached to max amount of attempts.
- * The POST checks if the result of the query is correct,
- * is so, it logs the user and delete  the user's ip from the ipChecker's objects,
- * if the result of the query is false, it adds the user's ip to the ipChecker's objects.
  */
 
-var express = require('express');
-var router = express.Router();
+'use strict'
 
-var IpChecker = require("./ipChecker");
-var ipc = new IpChecker((1000 * 60 * 10), 4);
+const http = require('http')
+const IpChecker = require('./ipChecker.js')
+const requestIp = require('request-ip')
 
-var message = "";
-var display = "";
+const ipc = new IpChecker(1000 * 30, 3, false)
 
-/**
- * GET request
- * @param  {Object}   req  [request params]
- * @param  {Object}   res  [response params]
- * @render {webpage}  [page]
- */
-router.get('/', function(req, res) {
-  ipc.maxAttempts(req.ip, function(bool) {
-    console.log('maxAttempts ' + bool);
-  });
+http.createServer((request, response) => {
+  // gets the ip of the request
+  let ip = requestIp.getClientIp(request)
 
-  ipc.numberOfAttempts(req.ip, function(attempts) {
-    console.log('numberOfAttempts ' + attempts);
-  });
+  // this snippet closes the request to favicon.ico
+  if (request.url === '/favicon.ico') {
+    response.end()
+    console.log('favicon requested')
+    return
+  }
 
-  ipc.isTimeout(req.ip, function(isTimeout) {
-    console.log('isTimeout ' + isTimeout);
-    message = 'get';
-    if (isTimeout)
-      message = 'timeout';
-    res.render('index', {
-      message: message
-    });
-  });
-});
+  // here we add an attempt to the ip
+  ipc.addAttempt(ip)
 
-/**
- * POST request
- * @param  {Object}   req  [request params]
- * @param  {Object}   res  [response params]
- * @render {webpage}  [page]
- */
-router.post('/', function(req, res, next) {
-  ipc.checkIp(req.ip, function(isTimeout) {
-    if (isTimeout) {
-      res.end();
-      return;
-    }
-    if (req.body.text === 'correct') {
-      ipc.removeIpAttempts(req.ip);
-      message = 'ok!';
+  // here we check if the client has reached the maximum number of attempts
+  // of if the client has an active timeout
+  ipc.checkClient(ip, (client) => {
+    if (!client) {
+      console.log('Request accepted')
+      response.writeHead(200, {'Content-Type': 'text/plain'})
+      response.end('Hello World\n')
     } else {
-      ipc.addIpAttempt(req.ip);
-      message = 'error';
+      console.log('Access denied')
+      response.writeHead(200, {'Content-Type': 'text/plain'})
+      response.end('Access denied\n')
     }
-    res.render('index', {
-      message: message
-    });
-  });
-});
+  })
+}).listen(8080)
+
+console.log('Server running at http://127.0.0.1:8080/')

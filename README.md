@@ -5,15 +5,15 @@ IpChecker is a lightweight firewall built for NodeJs.
 It provides some useful tools for the developer to track the number of attempts a client has performed and assigns a timeout after a certain number of attempts decided by the developer, where the client will be "frozen."
 
 It can be used to limit excessive requests to a DB, or to block a client that is making too many requests to a service.  
-[Example](https://github.com/delvedor/ipChecker/blob/master/example.js)
+Here you can find an [example](https://github.com/delvedor/ipChecker/blob/master/example.js).
 
 From the version 1.1.0 ipChecker doesn't use anymore a javascript object for store the ip timeout and the attempts, but uses [LevelDB](https://github.com/Level/levelup).
-It creates two hidden folders with all the persistent data.
+It creates one hidden folder named *ipCheckerDB* with all the persistent data.
 
 **Needs Node.js >= 4.0.0**
 
 ## Usage
-Simply download the file from this repository and put in the same directory (or in the /lib folder) of your project.  
+Simply [download](https://github.com/delvedor/ipChecker/blob/master/ipChecker.js) the file from this repository and put in the same directory (or in the /lib folder) of your project.  
 Then require the module in your code.
 ```Javascript
 const IpChecker = require("./ipChecker")
@@ -37,7 +37,7 @@ Here is the list of public API's exposed by the IpChecker module as well as a br
 <a name="IpChecker"></a>
 ### IpChecker(time, attempts, showErrors)
 *@param*  {Number}   **time**  [for how much time ipChecker must freeze an ip address ( default value: 10 mins )]  
-*@param*  {Number}   **attempts**  [how many failed attempts before freeze the ip address (default value: 4)]
+*@param*  {Number}   **attempts**  [how many failed attempts before freeze the ip address (default value: 4)]  
 *@param*  {Boolean}  **showErrors** [toggle show errors (default value: false)]
 ```Javascript
 // declaration without parameters
@@ -102,6 +102,7 @@ This function checks (in order):
 This function removes a given client from the ipChecker's DB.
 
 ## TODO
+- [ ] Improve docs
 - [ ] Publish to NPM
 - [ ] Add Redis support
 

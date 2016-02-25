@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/delvedor/ipChecker.git"
+    "url": "https://github.com/delvedor/LightFirewall.git"
   },
   "keywords": [
     "ip",
@@ -28,9 +28,9 @@
   "author": "Tomas Della Vedova - @delvedor (http://delved.org)",
   "license": "GPLv2",
   "bugs": {
-    "url": "https://github.com/delvedor/ipChecker/issues"
+    "url": "https://github.com/delvedor/LightFirewall/issues"
   },
-  "homepage": "https://github.com/delvedor/ipChecker",
+  "homepage": "https://github.com/delvedor/LightFirewall",
   "dependencies": {
     "level": "^1.4.0"
   },

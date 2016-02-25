@@ -1,19 +1,23 @@
 # Light Firewall
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)  
 
+*Formerly known as ipChecker.*  
 Light Firewall is a lightweight firewall built for NodeJs.  
 It provides some useful tools for the developer to track the number of attempts a client has performed and assigns a timeout after a certain number of attempts decided by the developer, where the client will be "frozen."
 
 It can be used to limit excessive requests to a DB, or to block a client that is making too many requests to a service.  
-Here you can find an [example](https://github.com/delvedor/ipChecker/blob/master/example.js).
+Here you can find an [example](https://github.com/delvedor/LightFirewall/blob/master/example.js).
 
 From the version 1.1.0 Light Firewall doesn't use anymore a JavaScript object for store the ip timeout and the attempts, but uses [LevelDB](https://github.com/Level/levelup).
-It creates one hidden folder named *ipCheckerDB* with all the persistent data.
+It creates one hidden folder named *LightFirewallDB* with all the persistent data.
 
 **Needs Node.js >= 4.0.0**
 
 ## Usage
-Simply [download](https://github.com/delvedor/ipChecker/blob/master/ipChecker.js) the file from this repository and put in the same directory (or in the /lib folder) of your project.  
+Download and install LightFirewall through npm:  
+```
+npm install light-firewall --save
+```  
 Then require the module in your code.
 ```Javascript
 const LightFirewall = require('light-firewall')

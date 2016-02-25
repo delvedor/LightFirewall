@@ -4,7 +4,7 @@
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
- * GitHub: https://github.com/delvedor/ipChecker
+ * GitHub: https://github.com/delvedor/LightFirewall
  */
 
 'use strict'

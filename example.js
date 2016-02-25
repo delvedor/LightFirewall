@@ -1,5 +1,5 @@
 /*
- * Project: IpChecker
+ * Project: LightFirewall
  * Version: 1.2.0
  * Author: delvedor
  * Twitter: @delvedor
@@ -10,10 +10,10 @@
 'use strict'
 
 const http = require('http')
-const IpChecker = require('./ipChecker.js')
+const LightFirewall = require('./LightFirewall.js')
 const requestIp = require('request-ip')
 
-const ipc = new IpChecker(1000 * 30, 3, false)
+const lf = new LightFirewall(1000 * 30, 3, false)
 
 http.createServer((request, response) => {
   // gets the ip of the request
@@ -27,11 +27,11 @@ http.createServer((request, response) => {
   }
 
   // here we add an attempt to the ip
-  ipc.addAttempt(ip)
+  lf.addAttempt(ip)
 
   // here we check if the client has reached the maximum number of attempts
   // of if the client has an active timeout
-  ipc.checkClient(ip, (client) => {
+  lf.checkClient(ip, (client) => {
     if (!client) {
       console.log('Request accepted')
       response.writeHead(200, {'Content-Type': 'text/plain'})

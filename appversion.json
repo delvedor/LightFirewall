@@ -11,7 +11,7 @@
     "total": 0
   },
   "commit": null,
-  "json": [
-    "package.json"
-  ]
+  "json": [],
+  "ignore": [],
+  "appversion": "1.2.0"
 }

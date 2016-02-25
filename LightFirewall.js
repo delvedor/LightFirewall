@@ -1,5 +1,5 @@
 /*
- * Project: IpChecker
+ * Project: LightFirewall
  * Version: 1.2.0
  * Author: delvedor
  * Twitter: @delvedor
@@ -11,7 +11,7 @@
 
 const level = require('level')
 
-module.exports = class IpChecker {
+module.exports = class LightFirewall {
   constructor (time, attempts, showErrors) {
     if (time) this.checkType(time, 'number')
     if (attempts) this.checkType(attempts, 'number')
@@ -20,7 +20,7 @@ module.exports = class IpChecker {
     this.time = time || 1000 * 60 * 10 // time before timeout, default to 10 mins
     this.attempts = attempts || 4// max amount of attempts, default value is 4
     this.showErrors = showErrors || false// toggle erros log, default to false
-    this.ipCheckerDB = level('.ipCheckerDB', {valueEncoding: 'json'}) // ipChecker Database
+    this.LightFirewallDB = level('.LightFirewallDB', {valueEncoding: 'json'}) // LightFirewall Database
   }
 
   /**
@@ -74,8 +74,8 @@ module.exports = class IpChecker {
     this.getClient(ip, (client) => {
       client = client || {timeout: null, attempts: null}
       client.attempts = (client.attempts ? client.attempts + 1 : 1)
-      this.ipCheckerDB.put(ip, client, (err) => {
-        if (this.showErrors) console.log(`ipChecker/addAttempt error -> ${err}`)
+      this.LightFirewallDB.put(ip, client, (err) => {
+        if (this.showErrors) console.log(`LightFirewall/addAttempt error -> ${err}`)
       })
     })
     return this
@@ -94,8 +94,8 @@ module.exports = class IpChecker {
       if (!client) return
       client.attempts = null
 
-      this.ipCheckerDB.put(ip, client, (err) => {
-        if (this.showErrors) console.log(`ipChecker/removeAttempts error -> ${err}`)
+      this.LightFirewallDB.put(ip, client, (err) => {
+        if (this.showErrors) console.log(`LightFirewall/removeAttempts error -> ${err}`)
       })
     })
     return this
@@ -115,8 +115,8 @@ module.exports = class IpChecker {
       let timeout = new Date().getTime()
       client.timeout = timeout + this.time
 
-      this.ipCheckerDB.put(ip, client, (err) => {
-        if (this.showErrors) console.log(`ipChecker/addTimeout error -> ${err}`)
+      this.LightFirewallDB.put(ip, client, (err) => {
+        if (this.showErrors) console.log(`LightFirewall/addTimeout error -> ${err}`)
       })
     })
     return this
@@ -135,8 +135,8 @@ module.exports = class IpChecker {
       if (!client) return
       client.timeout = null
 
-      this.ipCheckerDB.put(ip, client, (err) => {
-        if (this.showErrors) console.log(`ipChecker/removeTimeout error -> ${err}`)
+      this.LightFirewallDB.put(ip, client, (err) => {
+        if (this.showErrors) console.log(`LightFirewall/removeTimeout error -> ${err}`)
       })
     })
     return this
@@ -152,7 +152,7 @@ module.exports = class IpChecker {
     this.checkType(ip, 'string')
     this.checkType(callback, 'function')
 
-    this.ipCheckerDB.get(ip, (err, client) => {
+    this.LightFirewallDB.get(ip, (err, client) => {
       if (this.showErrors) console.log(err)
       client = client || null
       callback(client)
@@ -197,13 +197,13 @@ module.exports = class IpChecker {
    *  removeClient
    *  @param {String} ip  [ip address of the request]
    *
-   *  This function removes a given client from the ipChecker's DB.
+   *  This function removes a given client from the LightFirewall's DB.
    */
   removeClient (ip) {
     this.checkType(ip, 'string')
 
-    this.ipCheckerDB.del(ip, (err) => {
-      if (this.showErrors) console.log(`ipChecker/removeAttempts error -> ${err}`)
+    this.LightFirewallDB.del(ip, (err) => {
+      if (this.showErrors) console.log(`LightFirewall/removeAttempts error -> ${err}`)
     })
     return this
   }

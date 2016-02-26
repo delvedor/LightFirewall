@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
@@ -56,137 +56,180 @@ test('Testing function addAttempt()', (t) => {
 
   t.plan(1)
   lf.addAttempt(ip)
-  setTimeout(() => {
-    lf.getClient(ip, (client) => {
+    .then(() => {
+      return lf.getClient(ip)
+    })
+    .then((client) => {
       if (client.attempts === 1) {
         t.ok(1, 'addAttempt() works correctly!')
       } else {
         t.notok(1, 'addAttempt() didn\' work correctly')
       }
     })
-  }, 20)
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+    })
 })
 
 test('Testing function removeAttempts()', (t) => {
   t.plan(1)
   lf.removeAttempts(ip)
-  setTimeout(() => {
-    lf.getClient(ip, (client) => {
+    .then(() => {
+      return lf.getClient(ip)
+    })
+    .then((client) => {
       if (!client.attempts) {
         t.ok(true, 'removeAttempts() works correctly!')
       } else {
         t.notok(true, 'removeAttempts() didn\' work correctly')
       }
     })
-  }, 20)
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+    })
 })
 
 test('Testing function addTimeout()', (t) => {
   t.plan(1)
   lf.addTimeout(ip)
-  setTimeout(() => {
-    lf.getClient(ip, (client) => {
+    .then(() => {
+      return lf.getClient(ip)
+    })
+    .then((client) => {
       if (client.timeout && typeof client.timeout === 'number') {
         t.ok(true, 'addTimeout() works correctly!')
       } else {
         t.notok(true, 'addTimeout() didn\' work correctly')
       }
     })
-  }, 20)
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+    })
 })
 
 test('Testing function removeTimeout()', (t) => {
   t.plan(1)
   lf.removeTimeout(ip)
-  setTimeout(() => {
-    lf.getClient(ip, (client) => {
+    .then(() => {
+      return lf.getClient(ip)
+    })
+    .then((client) => {
       if (!client.timeout) {
         t.ok(true, 'removeTimeout() works correctly!')
       } else {
         t.notok(true, 'removeTimeout() didn\' work correctly')
       }
     })
-  }, 20)
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+    })
 })
 
 test('Testing function getClient()', (t) => {
   t.plan(2)
-  lf.getClient('::2', (client) => {
-    if (!client) {
-      t.ok(true, 'getClient() - empty works correctly!')
-    } else {
-      t.notok(true, 'getClient() - empty didn\'t work correctly')
-    }
-  })
-  lf.getClient(ip, (client) => {
-    if (client) {
-      t.ok(true, 'getClient() - full works correctly!')
-    } else {
-      t.notok(true, 'getClient() - full didn\'t work correctly')
-    }
-  })
+  lf.getClient('::2')
+    .then((client) => {
+      if (!client) {
+        t.ok(true, 'getClient() - empty works correctly!')
+      } else {
+        t.notok(true, 'getClient() - empty didn\'t work correctly')
+      }
+    })
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+    })
+
+  lf.getClient(ip)
+    .then((client) => {
+      if (client) {
+        t.ok(true, 'getClient() - empty works correctly!')
+      } else {
+        t.notok(true, 'getClient() - empty didn\'t work correctly')
+      }
+    })
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+    })
 })
 
 test('Testing function checkClient()', (t) => {
   t.plan(4)
-  lf.checkClient('::2', (client) => {
-    if (!client) {
-      t.ok(true, 'checkClient() - client not exist works correctly!')
-    } else {
-      t.notok(true, 'checkClient() - client not exist didn\'t work correctly')
-    }
-  })
-
-  // adds 4 attempts to ip
-  for (let i = 10; i <= 40; i = i + 10) {
-    setTimeout(() => { lf.addAttempt('::2') }, i)
-  }
-
-  // sets the time in negative for testing the checkClient isTimeout
-  lf.setTime(-1000 * 60 * 10)
-
-  setTimeout(() => {
-    lf.checkClient('::2', (client) => {
-      if (client) {
-        t.ok(true, 'checkClient() - max attempts works correctly!')
+  lf.checkClient('::2')
+    .then((bool) => {
+      if (!bool) {
+        t.ok(true, 'checkClient() - client not exist works correctly!')
       } else {
-        t.notok(true, 'checkClient() - max attempts didn\'t work correctly')
+        t.notok(true, 'checkClient() - client not exist didn\'t work correctly')
       }
+      // adds 4 attempts to ip
+      return lf.addAttempt('::2')
     })
-  }, 500)
-
-  setTimeout(() => {
-    lf.checkClient('::2', (client) => {
-      if (!client) {
+    .then(() => {
+      return lf.addAttempt('::2')
+    })
+    .then(() => {
+      return lf.addAttempt('::2')
+    })
+    .then(() => {
+      return lf.addAttempt('::2')
+    })
+    .then(() => {
+      // sets the time in negative for testing the checkClient isTimeout
+      lf.setTime(-1000 * 60 * 10)
+      return lf.checkClient('::2')
+    })
+    .then((bool) => {
+      if (bool) {
+        t.ok(true, 'checkClient() - client max attempts works correctly!')
+      } else {
+        t.notok(true, 'checkClient() - client max attempts didn\'t work correctly')
+      }
+      return lf.checkClient('::2')
+    })
+    .then((bool) => {
+      if (!bool) {
         t.ok(true, 'checkClient() - isTimeout works correctly!')
       } else {
         t.notok(true, 'checkClient() - isTimeout didn\'t work correctly')
       }
+      return lf.checkClient('::2')
     })
-  }, 1000)
-
-  setTimeout(() => {
-    lf.checkClient('::2', (client) => {
-      if (!client) {
+    .then((bool) => {
+      if (!bool) {
         t.ok(true, 'checkClient() - else works correctly!')
       } else {
         t.notok(true, 'checkClient() - else didn\'t work correctly')
       }
     })
-  }, 1500)
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+    })
 })
 
 test('Testing function removeClient()', (t) => {
   t.plan(1)
   lf.removeClient(ip)
-  setTimeout(() => {
-    lf.getClient(ip, (client) => {
+    .then(() => {
+      return lf.getClient(ip)
+    })
+    .then((client) => {
       if (!client) {
         t.ok(true, 'removeClient() works correctly!')
       } else {
         t.notok(true, 'removeClient() didn\'t work correctly')
       }
+      execSync('rm -rf .LightFirewallDB')
     })
-    execSync('rm -rf .LightFirewallDB')
-  }, 20)
+    .catch((err) => {
+      t.notok(true, 'Something went wrong')
+      console.log(err)
+      execSync('rm -rf .LightFirewallDB')
+    })
 })

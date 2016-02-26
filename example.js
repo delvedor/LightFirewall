@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
@@ -28,20 +28,25 @@ http.createServer((request, response) => {
 
   // here we add an attempt to the ip
   lf.addAttempt(ip)
-
-  // here we check if the client has reached the maximum number of attempts
-  // of if the client has an active timeout
-  lf.checkClient(ip, (client) => {
-    if (!client) {
-      console.log('Request accepted')
-      response.writeHead(200, {'Content-Type': 'text/plain'})
-      response.end('Hello World\n')
-    } else {
-      console.log('Access denied')
-      response.writeHead(200, {'Content-Type': 'text/plain'})
-      response.end('Access denied\n')
-    }
-  })
+    .then(() => {
+      // here we check if the client has reached the maximum number of attempts
+      // or if the client has an active timeout
+      return lf.checkClient(ip)
+    })
+    .then((client) => {
+      if (!client) {
+        console.log('Request accepted')
+        response.writeHead(200, {'Content-Type': 'text/plain'})
+        response.end('Hello World\n')
+      } else {
+        console.log('Access denied')
+        response.writeHead(200, {'Content-Type': 'text/plain'})
+        response.end('Access denied\n')
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
 }).listen(8080)
 
 console.log('Server running at http://127.0.0.1:8080/')

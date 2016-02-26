@@ -1,6 +1,8 @@
 # Light Firewall
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)  
 
+## -- Needs update --
+
 *Formerly known as ipChecker.*  
 Light Firewall is a lightweight firewall built for NodeJs.  
 It provides some useful tools for the developer to track the number of attempts a client has performed and assigns a timeout after a certain number of attempts decided by the developer, where the client will be "frozen."
@@ -109,7 +111,8 @@ This function removes a given client from the Light Firewall's DB.
 
 ## TODO
 - [ ] Improve docs
-- [ ] Publish to NPM
+- [x] Publish to NPM
+- [x] Reimplement with promises
 - [ ] Add Redis support
 
 ## Contributing

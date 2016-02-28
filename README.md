@@ -1,7 +1,6 @@
 # Light Firewall
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)  
 
-## -- Needs update --
 
 *Formerly known as ipChecker.*  
 Light Firewall is a lightweight firewall built for NodeJs.  
@@ -13,6 +12,9 @@ Here you can find an [example](https://github.com/delvedor/LightFirewall/blob/ma
 From the version 1.1.0 Light Firewall doesn't use anymore a JavaScript object for store the ip timeout and the attempts, but uses [LevelDB](https://github.com/Level/levelup).
 It creates one hidden folder named *LightFirewallDB* with all the persistent data.
 
+From the version 1.3.0 the code were reimplemented with promises, in this way you can chain multiple Light Firewall functions and be sure that the execution order will be respected.  
+Do you want an example? Check [here](https://github.com/delvedor/LightFirewall/blob/Promises/test.js#L163-L213).
+
 **Needs Node.js >= 4.0.0**
 
 ## Usage
@@ -22,12 +24,16 @@ npm install light-firewall --save
 ```  
 Then require the module in your code.
 ```Javascript
+// es5
 const LightFirewall = require('light-firewall')
+
+// es6 - es2015:
+import LightFirewall from 'light-firewall'
 ```
 
 ## API Reference
 Here is the list of public API's exposed by the Light Firewall module as well as a brief description of their use and how they work.  
-All the functions except for LightFirewall, getClient and checkClient, are chainable.
+All the functions except for LightFirewall, setTime, setAttempts and setShowErrors, return promises.
 
 - <a href="#LightFirewall">LightFirewall()</a>
 - <a href="#setTime">.setTime()</a>
@@ -48,56 +54,65 @@ All the functions except for LightFirewall, getClient and checkClient, are chain
 *@param*  {Boolean}  **showErrors** [toggle show errors (default value: false)]
 ```Javascript
 // declaration without parameters
-const ipc = new LightFirewall()
+const lf = new LightFirewall()
 // declaration with parameters
-const ipc = new LightFirewall((1000 * 10), 2, true)
+const lf = new LightFirewall((1000 * 10), 2, true)
 ```
 
 <a name="setTime"></a>
 ### setTime(time)
 *@param* {Number} **time**  [timeout time]  
+*@return* {LightFirewall}  
 Sets the timeout time.
 
 <a name="setAttempts"></a>
 ### setAttempts(attempts)
 *@param* {Number} **attempts**  [max number of attempts]  
+*@return* {LightFirewall}  
 Sets the maximum number of attempts.
 
 <a name="setShowErrors"></a>
 ### setShowErrors(showErrors)
 *@param* {Boolean} **showErrors**  [show errors]  
+*@return* {LightFirewall}  
 Toggles errors log.
 
 <a name="addAttempt"></a>
 ### addAttempt(ip)
 *@param* {String} **ip**  [ip address of the request]  
+*@return* {Promise}  
 This function adds an attempt to a given client.
 
 <a name="removeAttempts"></a>
 ### removeAttempts(ip)
 *@param* {String} **ip**  [ip address of the request]  
+*@return* {Promise}  
 This function removes all the attempts of a given client.
 
 <a name="addTimeout"></a>
 ### addTimeout(ip)
 *@param* {String} **ip**  [ip address of the request]  
+*@return* {Promise}  
 This function adds a timeout to a given client.
 
 <a name="removeTimeout"></a>
 ### removeTimeout(ip)
 *@param* {String} **ip**  [ip address of the request]  
+*@return* {Promise}  
 This function removes the timeout of a given client.
 
 <a name="getClient"></a>
 ### getClient(ip)
 *@param* {String} **ip**  [ip address of the request]  
 *@param* {Function}   **callback**    [callback]  
+*@return* {Promise}  
 This function returns the client and all his data, it returns null if the client is not in the DB.
 
 <a name="checkClient"></a>
 ### checkClient(ip)
 *@param* {String} **ip**  [ip address of the request]  
 *@param* {Function}   **callback**    [callback]  
+*@return* {Promise}  
 This function checks (in order):  
 1. If the given client exist, if not it returns false  
 2. if the given client has reached the maximum number of attempts, if so it adds a timeout, removes the attempts and returns true  
@@ -107,12 +122,13 @@ This function checks (in order):
 <a name="removeClient"></a>
 ### removeClient(ip)
 *@param* {String} **ip**  [ip address of the request]  
+*@return* {Promise}  
 This function removes a given client from the Light Firewall's DB.
 
 ## TODO
-- [ ] Improve docs
 - [x] Publish to NPM
 - [x] Reimplement with promises
+- [ ] Improve docs
 - [ ] Add Redis support
 
 ## Contributing

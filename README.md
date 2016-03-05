@@ -13,7 +13,7 @@ From the version 1.1.0 Light Firewall doesn't use anymore a JavaScript object fo
 It creates one hidden folder named *LightFirewallDB* with all the persistent data.
 
 From the version 2.0.0 the code were reimplemented with promises, in this way you can chain multiple Light Firewall functions and be sure that the execution order will be respected.  
-Do you want an example? Check [here](https://github.com/delvedor/LightFirewall/blob/Promises/test.js#L163-L213).
+Do you want an example? Check [here](https://github.com/delvedor/LightFirewall/blob/master/test.js#L176-L226).
 
 **Needs Node.js >= 4.0.0**
 

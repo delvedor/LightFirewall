@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 1.3.0
+ * Version: 2.0.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
@@ -92,16 +92,29 @@ test('Testing function removeAttempts()', (t) => {
 })
 
 test('Testing function addTimeout()', (t) => {
-  t.plan(1)
+  t.plan(2)
   lf.addTimeout(ip)
     .then(() => {
       return lf.getClient(ip)
     })
     .then((client) => {
-      if (client.timeout && typeof client.timeout === 'number') {
+      let time = (new Date()).getTime() + lf.time
+      if (client.timeout && typeof client.timeout === 'number' && client.timeout <= time) {
         t.ok(true, 'addTimeout() works correctly!')
       } else {
         t.notok(true, 'addTimeout() didn\' work correctly')
+      }
+      return lf.addTimeout(ip, 100000)
+    })
+    .then(() => {
+      return lf.getClient(ip)
+    })
+    .then((client) => {
+      let time = (new Date()).getTime() + 100000
+      if (client.timeout <= time) {
+        t.ok(true, 'addTimeout() custom works correctly!')
+      } else {
+        t.notok(true, 'addTimeout() custom didn\' work correctly')
       }
     })
     .catch((err) => {

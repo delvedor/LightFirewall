@@ -12,7 +12,7 @@ Here you can find an [example](https://github.com/delvedor/LightFirewall/blob/ma
 From the version 1.1.0 Light Firewall doesn't use anymore a JavaScript object for store the ip timeout and the attempts, but uses [LevelDB](https://github.com/Level/levelup).
 It creates one hidden folder named *LightFirewallDB* with all the persistent data.
 
-From the version 1.3.0 the code were reimplemented with promises, in this way you can chain multiple Light Firewall functions and be sure that the execution order will be respected.  
+From the version 2.0.0 the code were reimplemented with promises, in this way you can chain multiple Light Firewall functions and be sure that the execution order will be respected.  
 Do you want an example? Check [here](https://github.com/delvedor/LightFirewall/blob/Promises/test.js#L163-L213).
 
 **Needs Node.js >= 4.0.0**
@@ -25,7 +25,7 @@ npm install light-firewall --save
 Then require the module in your code.
 ```Javascript
 // es5
-const LightFirewall = require('light-firewall')
+var LightFirewall = require('light-firewall')
 
 // es6 - es2015:
 import LightFirewall from 'light-firewall'
@@ -90,8 +90,9 @@ This function adds an attempt to a given client.
 This function removes all the attempts of a given client.
 
 <a name="addTimeout"></a>
-### addTimeout(ip)
+### addTimeout(ip, timeout)
 *@param* {String} **ip**  [ip address of the request]  
+*@param* {Number} **timeout**  [custom timeout in milliseconds]  
 *@return* {Promise}  
 This function adds a timeout to a given client.
 
@@ -124,6 +125,37 @@ This function checks (in order):
 *@param* {String} **ip**  [ip address of the request]  
 *@return* {Promise}  
 This function removes a given client from the Light Firewall's DB.
+
+## Example
+```Javascript
+const LightFirewall = require('light-firewall')
+const lf = new LightFirewall()
+...
+lf.addAttempt(ipAddr)
+...
+lf.addTimeout(ipAddr, 100000)
+  .then(() => {
+    response.writeHead(403, {'Content-Type': 'text/plain'})
+    response.end('Access denied\n')
+  })
+  .catch((err= => {
+    console.log(err)
+  })
+...
+lf.checkClient(ipAddr)
+  .then((client) => {
+    if (!client) {
+      console.log('Request accepted')
+      response.writeHead(200, {'Content-Type': 'text/plain'})
+      response.end('Hello World\n')
+    } else {
+      console.log('Access denied')
+      response.writeHead(403, {'Content-Type': 'text/plain'})
+      response.end('Access denied\n')
+    }
+  })
+...
+```
 
 ## TODO
 - [x] Publish to NPM

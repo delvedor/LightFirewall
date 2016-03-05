@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 1.3.0
+ * Version: 2.0.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
@@ -13,9 +13,9 @@ const level = require('level')
 
 module.exports = class LightFirewall {
   constructor (time, attempts, showErrors) {
-    if (time) this.checkType(time, 'number')
-    if (attempts) this.checkType(attempts, 'number')
-    if (showErrors !== undefined) this.checkType(showErrors, 'boolean')
+    if (time) checkType(time, 'number')
+    if (attempts) checkType(attempts, 'number')
+    if (showErrors !== undefined) checkType(showErrors, 'boolean')
 
     this.time = time || 1000 * 60 * 10 // time before timeout, default to 10 mins
     this.attempts = attempts || 4// max amount of attempts, default value is 4
@@ -31,7 +31,7 @@ module.exports = class LightFirewall {
    *  Sets the timeout time.
    */
   setTime (time) {
-    if (time) this.checkType(time, 'number')
+    if (time) checkType(time, 'number')
 
     this.time = time || 1000 * 60 * 10
     return this
@@ -45,7 +45,7 @@ module.exports = class LightFirewall {
    *  Sets the maximum number of attempts.
    */
   setAttempts (attempts) {
-    if (attempts) this.checkType(attempts, 'number')
+    if (attempts) checkType(attempts, 'number')
 
     this.attempts = attempts || 4
     return this
@@ -59,7 +59,7 @@ module.exports = class LightFirewall {
    *  Toggles errors log
    */
   setShowErrors (showErrors) {
-    if (showErrors !== undefined) this.checkType(showErrors, 'boolean')
+    if (showErrors !== undefined) checkType(showErrors, 'boolean')
 
     this.showErrors = showErrors || false
     return this
@@ -73,7 +73,7 @@ module.exports = class LightFirewall {
    *  This function adds an attempt to a given client.
    */
   addAttempt (ip) {
-    this.checkType(ip, 'string')
+    checkType(ip, 'string')
 
     let promise = new Promise((resolve, reject) => {
       this.LightFirewallDB.get(ip, (getErr, client) => {
@@ -102,7 +102,7 @@ module.exports = class LightFirewall {
    *  This function removes all the attempts of a given client.
    */
   removeAttempts (ip) {
-    this.checkType(ip, 'string')
+    checkType(ip, 'string')
 
     let promise = new Promise((resolve, reject) => {
       this.LightFirewallDB.get(ip, (getErr, client) => {
@@ -130,20 +130,20 @@ module.exports = class LightFirewall {
   /**
    *  addTimeout
    *  @param {String} ip        [ip address of the request]
-   *  @param {Number} timeout   [custom timeout]
+   *  @param {Number} timeout   [custom timeout in milliseconds]
    *  @return {Promise}
    *
    * This function adds a timeout to a given client.
    */
   addTimeout (ip, timeout) {
-    this.checkType(ip, 'string')
-    if (timeout) this.checkType(timeout, 'number')
+    checkType(ip, 'string')
+    if (timeout) checkType(timeout, 'number')
 
     let promise = new Promise((resolve, reject) => {
       this.LightFirewallDB.get(ip, (getErr, client) => {
         if (this.showErrors) console.log(getErr)
         client = client || {timeout: null, attempts: null}
-        client.timeout = timeout || (new Date()).getTime() + this.time
+        client.timeout = (new Date()).getTime() + (timeout || this.time)
 
         this.LightFirewallDB.put(ip, client, (putErr) => {
           if (this.showErrors) console.log(putErr)
@@ -166,7 +166,7 @@ module.exports = class LightFirewall {
    *  This function removes the timeout of a given client.
    */
   removeTimeout (ip) {
-    this.checkType(ip, 'string')
+    checkType(ip, 'string')
 
     let promise = new Promise((resolve, reject) => {
       this.LightFirewallDB.get(ip, (getErr, client) => {
@@ -199,7 +199,7 @@ module.exports = class LightFirewall {
    *  This function returns the client and all his data, it returns null if the client is not in the DB.
    */
   getClient (ip) {
-    this.checkType(ip, 'string')
+    checkType(ip, 'string')
 
     let promise = new Promise((resolve, reject) => {
       this.LightFirewallDB.get(ip, (getErr, client) => {
@@ -228,7 +228,7 @@ module.exports = class LightFirewall {
    *  4) If none of above, it returns false.
    */
   checkClient (ip) {
-    this.checkType(ip, 'string')
+    checkType(ip, 'string')
 
     let promise = new Promise((resolve, reject) => {
       this.LightFirewallDB.get(ip, (getErr, client) => {
@@ -270,7 +270,7 @@ module.exports = class LightFirewall {
    *  This function removes a given client from the LightFirewall's DB.
    */
   removeClient (ip) {
-    this.checkType(ip, 'string')
+    checkType(ip, 'string')
 
     let promise = new Promise((resolve, reject) => {
       this.LightFirewallDB.del(ip, (delErr) => {
@@ -284,15 +284,15 @@ module.exports = class LightFirewall {
     })
     return promise
   }
+}
 
-  /**
-   *  checkType
-   *  @param {some variable}  variable  [some variable]
-   *  @param {String}         type      [type of the variable]
-   *
-   *  This functions checks if a variable if of the given type, if not, it throws an error.
-   */
-  checkType (variable, type) {
-    if (typeof variable !== type) throw new Error(`${variable} is not a ${type}`)
-  }
+/**
+ *  checkType
+ *  @param {some variable}  variable  [some variable]
+ *  @param {String}         type      [type of the variable]
+ *
+ *  This functions checks if a variable if of the given type, if not, it throws an error.
+ */
+function checkType (variable, type) {
+  if (typeof variable !== type) throw new Error(`${variable} is not a ${type}`)
 }

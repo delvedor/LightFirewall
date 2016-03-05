@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 1.3.0
+ * Version: 2.0.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: GNU GPLv2
@@ -40,7 +40,7 @@ http.createServer((request, response) => {
         response.end('Hello World\n')
       } else {
         console.log('Access denied')
-        response.writeHead(200, {'Content-Type': 'text/plain'})
+        response.writeHead(403, {'Content-Type': 'text/plain'})
         response.end('Access denied\n')
       }
     })

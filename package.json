@@ -1,6 +1,6 @@
 {
   "name": "light-firewall",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Lightweight firewall built for NodeJs",
   "main": "LightFirewall.js",
   "scripts": {

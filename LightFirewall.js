@@ -12,15 +12,17 @@
 const level = require('level')
 
 module.exports = class LightFirewall {
-  constructor (time, attempts, showErrors) {
+  constructor (time, attempts, showErrors, dbName) {
     if (time) checkType(time, 'number')
     if (attempts) checkType(attempts, 'number')
+    if (dbName) checkType(dbName, 'string')
     if (showErrors !== undefined) checkType(showErrors, 'boolean')
 
     this.time = time || 1000 * 60 * 10 // time before timeout, default to 10 mins
-    this.attempts = attempts || 4// max amount of attempts, default value is 4
-    this.showErrors = showErrors || false// toggle erros log, default to false
-    this.LightFirewallDB = level('.LightFirewallDB', {valueEncoding: 'json'}) // LightFirewall Database
+    this.attempts = attempts || 4 // max amount of attempts, default value is 4
+    this.showErrors = showErrors || false // toggle erros log, default to false
+    dbName = dbName || '.LightFirewallDB' // custom name of LightFirewall DB, default to .LightFirewallDB
+    this.LightFirewallDB = level(dbName, {valueEncoding: 'json'}) // LightFirewall Database
   }
 
   /**

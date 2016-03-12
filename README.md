@@ -48,10 +48,11 @@ All the functions except for LightFirewall, setTime, setAttempts and setShowErro
 - <a href="#removeClient">.removeClient()</a>
 
 <a name="LightFirewall"></a>
-### LightFirewall(time, attempts, showErrors)
+### LightFirewall(time, attempts, showErrors, dbName)
 *@param*  {Number}   **time**  [for how much time Light Firewall must freeze an ip address ( default value: 10 mins )]  
 *@param*  {Number}   **attempts**  [how many failed attempts before freeze the ip address (default value: 4)]  
 *@param*  {Boolean}  **showErrors** [toggle show errors (default value: false)]
+*@param*  {String}   **dbName** [custom name of the LightFirewall DB (default value: .LightFirewallDB)]
 ```Javascript
 // declaration without parameters
 const lf = new LightFirewall()

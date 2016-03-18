@@ -1,6 +1,6 @@
 # Light Firewall
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/) 
-[![AppVersion-version](https://img.shields.io/badge/AppVersion-2.1.0-brightgreen.svg?style=flat)](https://github.com/delvedor/appversion?#version)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
+[![AppVersion-version](https://img.shields.io/badge/AppVersion-2.1.1-brightgreen.svg?style=flat)](https://github.com/delvedor/appversion?#version)
 
 *Formerly known as ipChecker.*  
 Light Firewall is a lightweight firewall built for NodeJs.  
@@ -173,6 +173,6 @@ The code follows the Standard code style.
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 ______________________________________________________________________________________________________________________
 ## License
-The code is released under the GNU GPLv2 license.
+The code is released under the MIT license.
 
 The software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and non infringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use or other dealings in the software.

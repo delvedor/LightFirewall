@@ -1,9 +1,9 @@
 /*
  * Project: LightFirewall
- * Version: 2.1.0
+ * Version: 2.1.1
  * Author: delvedor
  * Twitter: @delvedor
- * License: GNU GPLv2
+ * License: MIT
  * GitHub: https://github.com/delvedor/LightFirewall
  */
 

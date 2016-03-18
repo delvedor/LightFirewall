@@ -1,6 +1,6 @@
 {
   "name": "light-firewall",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Lightweight firewall built for NodeJs",
   "main": "LightFirewall.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "javascript"
   ],
   "author": "Tomas Della Vedova - @delvedor (http://delved.org)",
-  "license": "GPLv2",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/delvedor/LightFirewall/issues"
   },
@@ -35,7 +35,7 @@
     "level": "^1.4.0"
   },
   "devDependencies": {
-    "standard": "^5.4.1",
-    "tape": "^4.4.0"
+    "standard": "^6.0.8",
+    "tape": "^4.5.1"
   }
 }

@@ -1,13 +1,14 @@
 {
   "name": "light-firewall",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Lightweight firewall built for NodeJs",
   "main": "LightFirewall.js",
   "scripts": {
-    "example": "node example.js",
-    "clean": "rm -rf .LightFirewallDB",
-    "pretest": "standard test.js && standard example.js && standard LightFirewall.js",
-    "test": "node test || true"
+    "example:promise": "npm run clean && npm run pretest && node example/promise.js",
+    "example:callback": "npm run clean && npm run pretest && node example/callback.js",
+    "clean": "rm -rf .LightFirewallDB .LightFirewallDBPromise .LightFirewallDBCallback",
+    "pretest": "standard && npm run clean",
+    "test": "tape test/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
     "level": "^1.4.0"
   },
   "devDependencies": {
+    "request-ip": "^1.2.2",
     "standard": "^6.0.8",
     "tape": "^4.5.1"
   }

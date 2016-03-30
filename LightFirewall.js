@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 2.1.1
+ * Version: 2.2.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: MIT
@@ -10,17 +10,18 @@
 'use strict'
 
 const level = require('level')
+const promise = require('./lib/promise')
+const callback = require('./lib/callback')
+const parameters = require('./lib/parameters')
 
 module.exports = class LightFirewall {
-  constructor (time, attempts, showErrors, dbName) {
+  constructor (time, attempts, dbName) {
     if (time) checkType(time, 'number')
     if (attempts) checkType(attempts, 'number')
     if (dbName) checkType(dbName, 'string')
-    if (showErrors !== undefined) checkType(showErrors, 'boolean')
 
-    this.time = time || 1000 * 60 * 10 // time before timeout, default to 10 mins
-    this.attempts = attempts || 4 // max amount of attempts, default value is 4
-    this.showErrors = showErrors || false // toggle erros log, default to false
+    parameters.time = time || 1000 * 60 * 10 // time before timeout, default to 10 mins
+    parameters.attempts = attempts || 4 // max amount of attempts, default value is 4
     dbName = dbName || '.LightFirewallDB' // custom name of LightFirewall DB, default to .LightFirewallDB
     this.LightFirewallDB = level(dbName, {valueEncoding: 'json'}) // LightFirewall Database
   }
@@ -35,7 +36,7 @@ module.exports = class LightFirewall {
   setTime (time) {
     if (time) checkType(time, 'number')
 
-    this.time = time || 1000 * 60 * 10
+    parameters.time = time || 1000 * 60 * 10
     return this
   }
 
@@ -49,21 +50,7 @@ module.exports = class LightFirewall {
   setAttempts (attempts) {
     if (attempts) checkType(attempts, 'number')
 
-    this.attempts = attempts || 4
-    return this
-  }
-
-  /**
-   *  setShowErrors
-   *  @param {Boolean} showErrors  [show errors]
-   *  @return {LightFirewall}
-   *
-   *  Toggles errors log
-   */
-  setShowErrors (showErrors) {
-    if (showErrors !== undefined) checkType(showErrors, 'boolean')
-
-    this.showErrors = showErrors || false
+    parameters.attempts = attempts || 4
     return this
   }
 
@@ -74,26 +61,13 @@ module.exports = class LightFirewall {
    *
    *  This function adds an attempt to a given client.
    */
-  addAttempt (ip) {
+  addAttempt (ip, cb) {
     checkType(ip, 'string')
-
-    let promise = new Promise((resolve, reject) => {
-      this.LightFirewallDB.get(ip, (getErr, client) => {
-        if (this.showErrors) console.log(getErr)
-        client = client || {timeout: null, attempts: null}
-        client.attempts = (client.attempts ? client.attempts + 1 : 1)
-
-        this.LightFirewallDB.put(ip, client, (putErr) => {
-          if (this.showErrors) console.log(putErr)
-          if (putErr) {
-            reject(putErr)
-          } else {
-            resolve()
-          }
-        })
-      })
-    })
-    return promise
+    if (cb) {
+      checkType(cb, 'function')
+      return callback.addAttempt(this.LightFirewallDB, ip, cb)
+    }
+    return promise.addAttempt(this.LightFirewallDB, ip)
   }
 
   /**
@@ -103,30 +77,13 @@ module.exports = class LightFirewall {
    *
    *  This function removes all the attempts of a given client.
    */
-  removeAttempts (ip) {
+  removeAttempts (ip, cb) {
     checkType(ip, 'string')
-
-    let promise = new Promise((resolve, reject) => {
-      this.LightFirewallDB.get(ip, (getErr, client) => {
-        if (this.showErrors) console.log(getErr)
-        if (!client) {
-          // reject(getErr)
-          resolve(null)
-          return
-        }
-        client.attempts = null
-
-        this.LightFirewallDB.put(ip, client, (putErr) => {
-          if (this.showErrors) console.log(putErr)
-          if (putErr) {
-            reject(putErr)
-          } else {
-            resolve()
-          }
-        })
-      })
-    })
-    return promise
+    if (cb) {
+      checkType(cb, 'function')
+      return callback.removeAttempts(this.LightFirewallDB, ip, cb)
+    }
+    return promise.removeAttempts(this.LightFirewallDB, ip)
   }
 
   /**
@@ -137,27 +94,18 @@ module.exports = class LightFirewall {
    *
    * This function adds a timeout to a given client.
    */
-  addTimeout (ip, timeout) {
+  addTimeout (ip, timeout, cb) {
     checkType(ip, 'string')
+    if (typeof timeout === 'function') {
+      cb = timeout
+      timeout = null
+    }
     if (timeout) checkType(timeout, 'number')
-
-    let promise = new Promise((resolve, reject) => {
-      this.LightFirewallDB.get(ip, (getErr, client) => {
-        if (this.showErrors) console.log(getErr)
-        client = client || {timeout: null, attempts: null}
-        client.timeout = (new Date()).getTime() + (timeout || this.time)
-
-        this.LightFirewallDB.put(ip, client, (putErr) => {
-          if (this.showErrors) console.log(putErr)
-          if (putErr) {
-            reject(putErr)
-          } else {
-            resolve()
-          }
-        })
-      })
-    })
-    return promise
+    if (cb) {
+      checkType(cb, 'function')
+      return callback.addTimeout(this.LightFirewallDB, ip, timeout, cb)
+    }
+    return promise.addTimeout(this.LightFirewallDB, ip, timeout)
   }
 
   /**
@@ -167,30 +115,13 @@ module.exports = class LightFirewall {
    *
    *  This function removes the timeout of a given client.
    */
-  removeTimeout (ip) {
+  removeTimeout (ip, cb) {
     checkType(ip, 'string')
-
-    let promise = new Promise((resolve, reject) => {
-      this.LightFirewallDB.get(ip, (getErr, client) => {
-        if (this.showErrors) console.log(getErr)
-        if (!client) {
-          // reject(getErr)
-          resolve(null)
-          return
-        }
-        client.timeout = null
-
-        this.LightFirewallDB.put(ip, client, (putErr) => {
-          if (this.showErrors) console.log(putErr)
-          if (putErr) {
-            reject(putErr)
-          } else {
-            resolve()
-          }
-        })
-      })
-    })
-    return promise
+    if (cb) {
+      checkType(cb, 'function')
+      return callback.removeTimeout(this.LightFirewallDB, ip, cb)
+    }
+    return promise.removeTimeout(this.LightFirewallDB, ip)
   }
 
   /**
@@ -200,21 +131,13 @@ module.exports = class LightFirewall {
    *
    *  This function returns the client and all his data, it returns null if the client is not in the DB.
    */
-  getClient (ip) {
+  getClient (ip, cb) {
     checkType(ip, 'string')
-
-    let promise = new Promise((resolve, reject) => {
-      this.LightFirewallDB.get(ip, (getErr, client) => {
-        if (this.showErrors) console.log(getErr)
-        if (getErr) {
-          // reject(getErr)
-          resolve(null)
-        } else {
-          resolve(client)
-        }
-      })
-    })
-    return promise
+    if (cb) {
+      checkType(cb, 'function')
+      return callback.getClient(this.LightFirewallDB, ip, cb)
+    }
+    return promise.getClient(this.LightFirewallDB, ip)
   }
 
   /**
@@ -229,39 +152,13 @@ module.exports = class LightFirewall {
    *  3) if the given client has an active timeout, if so it returns true
    *  4) If none of above, it returns false.
    */
-  checkClient (ip) {
+  checkClient (ip, cb) {
     checkType(ip, 'string')
-
-    let promise = new Promise((resolve, reject) => {
-      this.LightFirewallDB.get(ip, (getErr, client) => {
-        if (this.showErrors) console.log(getErr)
-        // 1)
-        if (!client) {
-          resolve(false)
-        // 2)
-        } else if (client.attempts >= this.attempts) {
-          this.addTimeout(ip)
-            .then(() => {
-              return this.removeAttempts(ip)
-            })
-            .then(() => {
-              resolve(true)
-            })
-            .catch((err) => {
-              console.log(err)
-            })
-        // 3)
-        } else if (client.timeout) {
-          let isTimeout = client.timeout > new Date().getTime()
-          if (!isTimeout) this.removeTimeout(ip)
-          resolve(isTimeout)
-        // 4)
-        } else {
-          resolve(false)
-        }
-      })
-    })
-    return promise
+    if (cb) {
+      checkType(cb, 'function')
+      return callback.checkClient(this.LightFirewallDB, ip, cb)
+    }
+    return promise.checkClient(this.LightFirewallDB, ip)
   }
 
   /**
@@ -271,20 +168,13 @@ module.exports = class LightFirewall {
    *
    *  This function removes a given client from the LightFirewall's DB.
    */
-  removeClient (ip) {
+  removeClient (ip, cb) {
     checkType(ip, 'string')
-
-    let promise = new Promise((resolve, reject) => {
-      this.LightFirewallDB.del(ip, (delErr) => {
-        if (this.showErrors) console.log(delErr)
-        if (delErr) {
-          reject(delErr)
-        } else {
-          resolve()
-        }
-      })
-    })
-    return promise
+    if (cb) {
+      checkType(cb, 'function')
+      return callback.removeClient(this.LightFirewallDB, ip, cb)
+    }
+    return promise.removeClient(this.LightFirewallDB, ip)
   }
 }
 

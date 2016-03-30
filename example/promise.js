@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 2.1.1
+ * Version: 2.2.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: MIT
@@ -10,10 +10,10 @@
 'use strict'
 
 const http = require('http')
-const LightFirewall = require('./LightFirewall.js')
+const LightFirewall = require('../LightFirewall.js')
 const requestIp = require('request-ip')
 
-const lf = new LightFirewall(1000 * 30, 3, false)
+const lf = new LightFirewall(1000 * 10, 3, false)
 
 http.createServer((request, response) => {
   // gets the ip of the request

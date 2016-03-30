@@ -1,6 +1,6 @@
 /*
  * Project: LightFirewall
- * Version: 2.1.1
+ * Version: 2.2.0
  * Author: delvedor
  * Twitter: @delvedor
  * License: MIT
@@ -11,48 +11,17 @@
 
 const test = require('tape')
 const execSync = require('child_process').execSync
-const LightFirewall = require('./LightFirewall.js')
+const LightFirewall = require('../LightFirewall.js')
+const lfParams = require('../lib/parameters.js')
 
-execSync('rm -rf .LightFirewallDB')
+execSync('rm -rf .LightFirewallDBPromise')
 
-const lf = new LightFirewall()
+const lf = new LightFirewall(null, null, '.LightFirewallDBPromise')
 const ip = '::1'
 
-test('Testing function setTime()', (t) => {
-  t.plan(1)
-  let time = Math.floor(Math.random() * 1000) + 1
-  lf.setTime(time)
-  if (lf.time === time) {
-    t.ok(time, 'Time was correctly changed!')
-  } else {
-    t.notok(time, 'Time was not correctly changed! :(')
-  }
-})
-
-test('Testing function setAttempts()', (t) => {
-  t.plan(1)
-  let attempts = Math.floor(Math.random() * 6) + 1
-  lf.setAttempts(attempts)
-  if (lf.attempts === attempts) {
-    t.ok(attempts, 'Attempts were correctly changed!')
-  } else {
-    t.notok(attempts, 'Attempts were not correctly changed! :(')
-  }
-})
-
-test('Testing function setShowErrors()', (t) => {
-  t.plan(1)
-  lf.setShowErrors(true)
-  if (lf.showErrors === true) {
-    t.ok(true, 'showErrors was correctly changed!')
-  } else {
-    t.notok(true, 'showErrors was not correctly changed! :(')
-  }
-})
-
-test('Testing function addAttempt()', (t) => {
+test('Testing promise function addAttempt()', (t) => {
   // Restore to default values
-  lf.setTime(1000 * 60 * 10).setAttempts(4).setShowErrors(false)
+  lf.setTime(1000 * 60 * 10).setAttempts(4)
 
   t.plan(1)
   lf.addAttempt(ip)
@@ -61,9 +30,9 @@ test('Testing function addAttempt()', (t) => {
     })
     .then((client) => {
       if (client.attempts === 1) {
-        t.ok(1, 'addAttempt() works correctly!')
+        t.ok(1, 'addAttempt() promise works correctly!')
       } else {
-        t.notok(1, 'addAttempt() didn\' work correctly')
+        t.notok(1, 'addAttempt() promise didn\'t work correctly')
       }
     })
     .catch((err) => {
@@ -72,7 +41,7 @@ test('Testing function addAttempt()', (t) => {
     })
 })
 
-test('Testing function removeAttempts()', (t) => {
+test('Testing promise function removeAttempts()', (t) => {
   t.plan(1)
   lf.removeAttempts(ip)
     .then(() => {
@@ -80,9 +49,9 @@ test('Testing function removeAttempts()', (t) => {
     })
     .then((client) => {
       if (!client.attempts) {
-        t.ok(true, 'removeAttempts() works correctly!')
+        t.ok(true, 'removeAttempts() promise works correctly!')
       } else {
-        t.notok(true, 'removeAttempts() didn\' work correctly')
+        t.notok(true, 'removeAttempts() promise didn\'t work correctly')
       }
     })
     .catch((err) => {
@@ -91,18 +60,18 @@ test('Testing function removeAttempts()', (t) => {
     })
 })
 
-test('Testing function addTimeout()', (t) => {
+test('Testing promise function addTimeout()', (t) => {
   t.plan(2)
   lf.addTimeout(ip)
     .then(() => {
       return lf.getClient(ip)
     })
     .then((client) => {
-      let time = (new Date()).getTime() + lf.time
+      let time = (new Date()).getTime() + lfParams.time
       if (client.timeout && typeof client.timeout === 'number' && client.timeout <= time) {
-        t.ok(true, 'addTimeout() works correctly!')
+        t.ok(true, 'addTimeout() promise works correctly!')
       } else {
-        t.notok(true, 'addTimeout() didn\' work correctly')
+        t.notok(true, 'addTimeout() promise didn\'t work correctly')
       }
       return lf.addTimeout(ip, 100000)
     })
@@ -112,9 +81,9 @@ test('Testing function addTimeout()', (t) => {
     .then((client) => {
       let time = (new Date()).getTime() + 100000
       if (client.timeout <= time) {
-        t.ok(true, 'addTimeout() custom works correctly!')
+        t.ok(true, 'addTimeout() promise custom works correctly!')
       } else {
-        t.notok(true, 'addTimeout() custom didn\' work correctly')
+        t.notok(true, 'addTimeout() promise custom didn\'t work correctly')
       }
     })
     .catch((err) => {
@@ -123,7 +92,7 @@ test('Testing function addTimeout()', (t) => {
     })
 })
 
-test('Testing function removeTimeout()', (t) => {
+test('Testing promise function removeTimeout()', (t) => {
   t.plan(1)
   lf.removeTimeout(ip)
     .then(() => {
@@ -131,9 +100,9 @@ test('Testing function removeTimeout()', (t) => {
     })
     .then((client) => {
       if (!client.timeout) {
-        t.ok(true, 'removeTimeout() works correctly!')
+        t.ok(true, 'removeTimeout() promise works correctly!')
       } else {
-        t.notok(true, 'removeTimeout() didn\' work correctly')
+        t.notok(true, 'removeTimeout() promise didn\'t work correctly')
       }
     })
     .catch((err) => {
@@ -142,14 +111,14 @@ test('Testing function removeTimeout()', (t) => {
     })
 })
 
-test('Testing function getClient()', (t) => {
+test('Testing promise function getClient()', (t) => {
   t.plan(2)
   lf.getClient('::2')
     .then((client) => {
       if (!client) {
-        t.ok(true, 'getClient() - empty works correctly!')
+        t.ok(true, 'getClient() promise - empty works correctly!')
       } else {
-        t.notok(true, 'getClient() - empty didn\'t work correctly')
+        t.notok(true, 'getClient() promise - empty didn\'t work correctly')
       }
     })
     .catch((err) => {
@@ -160,9 +129,9 @@ test('Testing function getClient()', (t) => {
   lf.getClient(ip)
     .then((client) => {
       if (client) {
-        t.ok(true, 'getClient() - empty works correctly!')
+        t.ok(true, 'getClient() promise - empty works correctly!')
       } else {
-        t.notok(true, 'getClient() - empty didn\'t work correctly')
+        t.notok(true, 'getClient() promise - empty didn\'t work correctly')
       }
     })
     .catch((err) => {
@@ -171,14 +140,14 @@ test('Testing function getClient()', (t) => {
     })
 })
 
-test('Testing function checkClient()', (t) => {
+test('Testing promise function checkClient()', (t) => {
   t.plan(4)
   lf.checkClient('::2')
     .then((bool) => {
       if (!bool) {
-        t.ok(true, 'checkClient() - client not exist works correctly!')
+        t.ok(true, 'checkClient() promise - client not exist works correctly!')
       } else {
-        t.notok(true, 'checkClient() - client not exist didn\'t work correctly')
+        t.notok(true, 'checkClient() promise - client not exist didn\'t work correctly')
       }
       // adds 4 attempts to ip
       return lf.addAttempt('::2')
@@ -199,25 +168,25 @@ test('Testing function checkClient()', (t) => {
     })
     .then((bool) => {
       if (bool) {
-        t.ok(true, 'checkClient() - client max attempts works correctly!')
+        t.ok(true, 'checkClient() promise - client max attempts works correctly!')
       } else {
-        t.notok(true, 'checkClient() - client max attempts didn\'t work correctly')
+        t.notok(true, 'checkClient() promise - client max attempts didn\'t work correctly')
       }
       return lf.checkClient('::2')
     })
     .then((bool) => {
       if (!bool) {
-        t.ok(true, 'checkClient() - isTimeout works correctly!')
+        t.ok(true, 'checkClient() promise - isTimeout works correctly!')
       } else {
-        t.notok(true, 'checkClient() - isTimeout didn\'t work correctly')
+        t.notok(true, 'checkClient() promise - isTimeout didn\'t work correctly')
       }
       return lf.checkClient('::2')
     })
     .then((bool) => {
       if (!bool) {
-        t.ok(true, 'checkClient() - else works correctly!')
+        t.ok(true, 'checkClient() promise - else works correctly!')
       } else {
-        t.notok(true, 'checkClient() - else didn\'t work correctly')
+        t.notok(true, 'checkClient() promise - else didn\'t work correctly')
       }
     })
     .catch((err) => {
@@ -226,7 +195,7 @@ test('Testing function checkClient()', (t) => {
     })
 })
 
-test('Testing function removeClient()', (t) => {
+test('Testing promise function removeClient()', (t) => {
   t.plan(1)
   lf.removeClient(ip)
     .then(() => {
@@ -234,15 +203,15 @@ test('Testing function removeClient()', (t) => {
     })
     .then((client) => {
       if (!client) {
-        t.ok(true, 'removeClient() works correctly!')
+        t.ok(true, 'removeClient() promise works correctly!')
       } else {
-        t.notok(true, 'removeClient() didn\'t work correctly')
+        t.notok(true, 'removeClient() promise didn\'t work correctly')
       }
-      execSync('rm -rf .LightFirewallDB')
+      execSync('rm -rf .LightFirewallDBPromise')
     })
     .catch((err) => {
       t.notok(true, 'Something went wrong')
       console.log(err)
-      execSync('rm -rf .LightFirewallDB')
+      execSync('rm -rf .LightFirewallDBPromise')
     })
 })

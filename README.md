@@ -192,6 +192,8 @@ function noop () {}
 ## TODO
 - [x] Publish to NPM
 - [x] Reimplement with promises
+- [x] API with promises and callbacks
+- [x] More testing
 - [ ] Improve docs
 - [ ] Add Redis support
 

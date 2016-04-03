@@ -6,9 +6,9 @@
   "scripts": {
     "example:promise": "npm run clean && npm run pretest && node example/promise.js",
     "example:callback": "npm run clean && npm run pretest && node example/callback.js",
-    "clean": "rm -rf .LightFirewallDB .LightFirewallDBPromise .LightFirewallDBCallback",
+    "clean": "rm -rf .LightFirewallDB .LightFirewallDBPromise .LightFirewallDBCallback .LightFirewallDBServerCallback .LightFirewallDBServerPromise",
     "pretest": "standard && npm run clean",
-    "test": "tape test/**/*.js"
+    "test": "tape test/*.js && tape test/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "level": "^1.4.0"
   },
   "devDependencies": {
+    "request": "^2.69.0",
     "request-ip": "^1.2.2",
     "standard": "^6.0.8",
     "tape": "^4.5.1"

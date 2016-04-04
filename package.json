@@ -8,7 +8,10 @@
     "example:callback": "npm run clean && npm run pretest && node example/callback.js",
     "clean": "rm -rf .LightFirewallDB .LightFirewallDBPromise .LightFirewallDBCallback .LightFirewallDBServerCallback .LightFirewallDBServerPromise",
     "pretest": "standard && npm run clean",
-    "test": "tape test/*.js && tape test/**/*.js"
+    "test": "tape test/*.js && tape test/**/*.js",
+    "bench": "standard && npm run bench:callback && npm run bench:promise",
+    "bench:callback": "node benchmark/callback.js",
+    "bench:promise": "node benchmark/promise.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +39,7 @@
     "level": "^1.4.0"
   },
   "devDependencies": {
+    "fastbench": "^1.0.1",
     "request": "^2.69.0",
     "request-ip": "^1.2.2",
     "standard": "^6.0.8",

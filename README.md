@@ -59,6 +59,8 @@ All the functions except for LightFirewall, setTime and setAttempts, return prom
 const lf = new LightFirewall()
 // declaration with parameters
 const lf = new LightFirewall((1000 * 10), 2, '.CustomDbName')
+// declaration with default parameters and custom name
+const lf = new LightFirewall(null, null, '.CustomDbName')
 ```
 
 <a name="setTime"></a>

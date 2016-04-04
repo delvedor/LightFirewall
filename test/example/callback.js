@@ -7,7 +7,7 @@ const execSync = require('child_process').execSync
 const test = require('tape')
 
 const LightFirewall = require('../../LightFirewall.js')
-const lf = new LightFirewall(1000 * 10, 3, '.LightFirewallDBServerCallback')
+const lf = new LightFirewall(1000 * 5, 3, '.LightFirewallDBServerCallback')
 
 const server = http.createServer((request, response) => {
   // gets the ip of the request
@@ -63,7 +63,7 @@ test('Test server callback #3', (t) => {
 
 test('Test server callback #4', (t) => {
   t.plan(2)
-  console.log('Wait 11 seconds...')
+  console.log('Wait 6 seconds...')
   setTimeout(() => {
     request('http://127.0.0.1:8080', function (err, response, body) {
       if (err) console.log(err)
@@ -72,5 +72,5 @@ test('Test server callback #4', (t) => {
       server.close()
       execSync('rm -rf .LightFirewallDBServerCallback')
     })
-  }, 1000 * 11)
+  }, 1000 * 6)
 })

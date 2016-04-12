@@ -1,6 +1,6 @@
 # Light Firewall
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
-[![AppVersion-version](https://img.shields.io/badge/AppVersion-2.2.0-brightgreen.svg?style=flat)](https://github.com/delvedor/appversion?#version)
+[![AppVersion-version](https://img.shields.io/badge/AppVersion-2.2.1-brightgreen.svg?style=flat)](https://github.com/delvedor/appversion?#version)
 [![Build Status](https://travis-ci.org/delvedor/LightFirewall.svg?branch=master)](https://travis-ci.org/delvedor/LightFirewall)
 
 *Formerly known as ipChecker.*  
